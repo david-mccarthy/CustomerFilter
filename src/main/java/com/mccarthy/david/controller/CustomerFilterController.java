@@ -1,9 +1,9 @@
 package com.mccarthy.david.controller;
 
-import com.mccarthy.david.model.Customer;
 import com.mccarthy.david.io.FileHandler;
+import com.mccarthy.david.model.Customer;
+import com.mccarthy.david.services.DistanceFilterService;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,29 +11,26 @@ import java.util.stream.Collectors;
  * Controller class to orchestrate the logic of the application.
  */
 public class CustomerFilterController {
-    protected FileHandler fileHandler;
+    private static final double MAX_DISTANCE = 100;
 
-    public CustomerFilterController(FileHandler fileHandler) {
+    protected final FileHandler fileHandler;
+    protected final DistanceFilterService distanceFilterService;
+
+    public CustomerFilterController(FileHandler fileHandler, DistanceFilterService distanceFilterService) {
+        this.distanceFilterService = distanceFilterService;
         this.fileHandler = fileHandler;
     }
 
     public void processCustomerDataFile(String inputFileName, String outputFileName) {
         try {
-            List<Customer> customersFromFile = fileHandler.getCustomersFromFile(inputFileName);
-
-            //Filter customers.
-
-            fileHandler.writeCustomersToFile(outputFileName, customersFromFile.stream().sorted(new Comparator<Customer>() {
-                @Override
-                public int compare(Customer o1, Customer o2) {
-                    if (o1.getUserId() < o2.getUserId()) {
-                        return -1;
-                    } else if (o1.getUserId() == o2.getUserId()) {
-                        return 0;
-                    }
-                    return 1;
-                }
-            }).collect(Collectors.toList()));
+            List<Customer> initialCustomerList = fileHandler.getCustomersFromFile(inputFileName);
+            List<Customer> filteredCustomers = distanceFilterService.filterCustomersByDistance(initialCustomerList, MAX_DISTANCE);
+            List<Customer> sortedCustomerList = filteredCustomers.stream().sorted(Customer.getComparator()).collect(Collectors.toList());
+            //Output file to STDOUT.
+            fileHandler.writeCustomersToFile(outputFileName, sortedCustomerList);
+            for(Customer c : sortedCustomerList){
+                System.out.println(c);
+            }
         } catch (Exception e) {
             System.out.println("Exception thrown in application and caught gracefully in the end");
         }

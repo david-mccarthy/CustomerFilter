@@ -2,7 +2,6 @@ package com.mccarthy.david.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mccarthy.david.model.Customer;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;

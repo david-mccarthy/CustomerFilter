@@ -1,6 +1,6 @@
 package com.mccarthy.david.integration;
 
-import com.mccarthy.david.CustomerFilter;
+import com.mccarthy.david.Main;
 import org.junit.Test;
 
 public class CustomerFilterIntegrationTest {
@@ -9,13 +9,13 @@ public class CustomerFilterIntegrationTest {
 
     @Test
     public void testSuccess() {
-        CustomerFilter.main(new String[]{TEST_FILE, OUTPUT_FILE});
+        Main.main(new String[]{TEST_FILE, OUTPUT_FILE});
 
     }
 
     @Test
     public void testFailureCustomerDataFileNotFound() {
-        CustomerFilter.main(new String[]{"NonExistantInputFile", OUTPUT_FILE});
+        Main.main(new String[]{"NonExistantInputFile", OUTPUT_FILE});
     }
 }
 

@@ -1,6 +1,7 @@
 package com.mccarthy.david.io;
 
 import com.mccarthy.david.model.Customer;
+import com.mccarthy.david.utils.TestHelper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class FileHandlerTest {
-    public static final String CUSTOMER_DATA_FORMAT = "{\"latitude\": \"%s\", \"user_id\": %s, \"name\": \"%s\", \"longitude\": \"%s\"}";
     public static final String TEST_FILE = "src/test/resources/customers.txt";
     private FileHandler fileUtils;
     private List<String> customerStringList;
@@ -27,10 +27,10 @@ public class FileHandlerTest {
      * Test that we can read a file and process it into a list of customers.
      */
     @Test
-    public void testReadFileAndProcess() throws Exception{
+    public void testReadFileAndProcess() throws Exception {
         List<Customer> customersFromFile = fileUtils.getCustomersFromFile(TEST_FILE);
         assertNotNull(customersFromFile);
-        assertEquals("Incorrect number of customers created from file.",32,customersFromFile.size());
+        assertEquals("Incorrect number of customers created from file.", 32, customersFromFile.size());
     }
 
     /**
@@ -40,16 +40,16 @@ public class FileHandlerTest {
      */
     @Test
     public void testMapListOfCustomerDataToCustomerModel() {
-        customerStringList.add(createTestCustomer("1","TestCustomer1","54.12345","-2.12312"));
-        customerStringList.add(createTestCustomer("2","TestCustomer2","45.22334","-5.22223"));
-        customerStringList.add(createTestCustomer("3","TestCustomer3","23.40404","-10.22022"));
+        customerStringList.add(TestHelper.createTestCustomerString("1", "TestCustomer1", 54.12345, -2.12312));
+        customerStringList.add(TestHelper.createTestCustomerString("2", "TestCustomer2", 45.22334, -5.22223));
+        customerStringList.add(TestHelper.createTestCustomerString("3", "TestCustomer3", 23.40404, -10.22022));
         List<Customer> customers = fileUtils.mapToListOfCustomers(customerStringList);
-        assertEquals("Number of customers should be 4", 4, customers.size());
-        for(Customer customer: customers){
+        assertEquals("Number of customers should be 3", 3, customers.size());
+        for (Customer customer : customers) {
             //No need to test primitive int userId - cannot be null.
-            assertNotNull("Customer should not be null.",customer);
+            assertNotNull("Customer should not be null.", customer);
             assertNotNull("Customer name is not null.", customer.getName());
-            assertNotNull("Customer latitude should not be null.",customer.getLatitude());
+            assertNotNull("Customer latitude should not be null.", customer.getLatitude());
             assertNotNull("Customers longitude should not be null.", customer.getLongitude());
         }
     }
@@ -58,15 +58,15 @@ public class FileHandlerTest {
     public void testCreateCustomerFromCustomerData() {
         String userId = "100";
         String customerName = "TestCustomerName";
-        String latitude = "52.833502";
-        String longitude = "-8.522366";
-        Customer customer = fileUtils.mapCustomer(createTestCustomer(userId, customerName, latitude, longitude));
+        double latitude = 52.833502;
+        double longitude = -8.522366;
+        Customer customer = fileUtils.mapCustomer(TestHelper.createTestCustomerString(userId, customerName, latitude, longitude));
 
         assertNotNull("Customer should not be null", customer);
         assertEquals("User id does not match", Integer.parseInt(userId), customer.getUserId());
         assertEquals("Customer name does not match", customerName, customer.getName());
-        assertEquals("Latitude does not match", new BigDecimal(latitude), customer.getLatitude());
-        assertEquals("Longitude does not match", new BigDecimal(longitude), customer.getLongitude());
+        assertEquals("Latitude does not match", latitude, customer.getLatitude(), 0);
+        assertEquals("Longitude does not match", longitude, customer.getLongitude(), 0);
     }
 
     //Test file does not exist
@@ -75,7 +75,4 @@ public class FileHandlerTest {
 
     //Test file exists, has bad entries
 
-    private String createTestCustomer(String userId, String customerName, String latitude, String longitude) {
-        return String.format(CUSTOMER_DATA_FORMAT, latitude, userId, customerName, longitude);
-    }
 }
