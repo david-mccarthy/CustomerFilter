@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.mccarthy.david'
-version '1.0-SNAPSHOT'
+version ''
 
 repositories {
     mavenCentral()

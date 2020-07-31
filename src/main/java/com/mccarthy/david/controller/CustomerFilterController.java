@@ -1,8 +1,12 @@
 package com.mccarthy.david.controller;
 
-import com.mccarthy.david.io.FileHandler;
+import com.mccarthy.david.error.ErrorService;
+import com.mccarthy.david.error.InputException;
+import com.mccarthy.david.io.CustomerReadService;
+import com.mccarthy.david.io.OutputService;
 import com.mccarthy.david.model.Customer;
 import com.mccarthy.david.services.DistanceFilterService;
+import com.mccarthy.david.validation.CustomerValidationService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,26 +17,59 @@ import java.util.stream.Collectors;
 public class CustomerFilterController {
     private static final double MAX_DISTANCE = 100;
 
-    protected final FileHandler fileHandler;
+    protected final CustomerReadService customerReadService;
     protected final DistanceFilterService distanceFilterService;
+    protected final CustomerValidationService customerValidationService;
+    protected final ErrorService errorService;
+    protected final OutputService outputService;
 
-    public CustomerFilterController(FileHandler fileHandler, DistanceFilterService distanceFilterService) {
+    /**
+     * Set up dependencies.
+     *
+     * @param customerReadService       Service to read the customer data from file.
+     * @param distanceFilterService     Service to filter customers based on their distance to the office.
+     * @param customerValidationService Service to validate customer data that has been read from a file.
+     * @param errorService              Service to handle errors in the application.
+     * @param outputService             Service to output data from the application.
+     */
+    public CustomerFilterController(CustomerReadService customerReadService,
+                                    DistanceFilterService distanceFilterService,
+                                    CustomerValidationService customerValidationService,
+                                    ErrorService errorService,
+                                    OutputService outputService) {
         this.distanceFilterService = distanceFilterService;
-        this.fileHandler = fileHandler;
+        this.customerReadService = customerReadService;
+        this.customerValidationService = customerValidationService;
+        this.errorService = errorService;
+        this.outputService = outputService;
     }
 
+    /**
+     * Process the customer data file and output the result
+     *
+     * @param inputFileName Customer data input file.
+     */
+    public void processCustomerDataFile(String inputFileName) {
+        processCustomerDataFile(inputFileName, null);
+    }
+
+    /**
+     * Process the customer data file and output the result to the file as well as stdout.
+     *
+     * @param inputFileName  Input data file.
+     * @param outputFileName Output file name.
+     */
     public void processCustomerDataFile(String inputFileName, String outputFileName) {
         try {
-            List<Customer> initialCustomerList = fileHandler.getCustomersFromFile(inputFileName);
-            List<Customer> filteredCustomers = distanceFilterService.filterCustomersByDistance(initialCustomerList, MAX_DISTANCE);
+            List<Customer> inputCustomerList = customerReadService.getCustomersFromFile(inputFileName);
+            List<Customer> filteredCustomers = distanceFilterService.filterCustomersByDistance(inputCustomerList, MAX_DISTANCE);
             List<Customer> sortedCustomerList = filteredCustomers.stream().sorted(Customer.getComparator()).collect(Collectors.toList());
-            //Output file to STDOUT.
-            fileHandler.writeCustomersToFile(outputFileName, sortedCustomerList);
-            for(Customer c : sortedCustomerList){
-                System.out.println(c);
-            }
+            outputService.outputCustomers(outputFileName, sortedCustomerList);
+        } catch (InputException e) {
+            //Do nothing - errors already output.
         } catch (Exception e) {
-            System.out.println("Exception thrown in application and caught gracefully in the end");
+            //Any unexpected errors, print the stack trace.
+            e.printStackTrace();
         }
     }
 }

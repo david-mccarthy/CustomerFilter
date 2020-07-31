@@ -2,7 +2,6 @@ package com.mccarthy.david.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 
 /**
@@ -10,50 +9,35 @@ import java.util.Comparator;
  */
 public class Customer {
     @JsonProperty("user_id")
-    private int userId;
-    @JsonProperty
-    private double latitude;
-    @JsonProperty
-    private double longitude;
-    @JsonProperty
+    private Integer userId;
+    @JsonProperty("latitude")
+    private Double latitude;
+    @JsonProperty("longitude")
+    private Double longitude;
+    @JsonProperty("name")
     private String name;
 
-    /**
-     * Get this customers user id.
-     *
-     * @return Customers user id.
-     */
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    /**
-     * Set the user id for this customer.
-     *
-     * @param userId Customers user id.
-     */
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    /**
-     * Get the latitude of this customers address.
-     *
-     * @return Latitude of this customers address.
-     */
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -65,11 +49,19 @@ public class Customer {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return this.userId + ": " + this.name;
+    public String getNameAndId() {
+        return this.name + ": " + this.userId;
     }
 
+    @Override
+    public String toString() {
+        return this.userId + ": " + this.name + " (" + this.latitude + ", " + this.longitude + ")";
+    }
+
+    /**
+     * Get a comparotor that allows us to sort a list of customers.
+     * @return Comparator for customers.
+     */
     public static Comparator<Customer> getComparator() {
         return new Comparator<Customer>() {
             @Override

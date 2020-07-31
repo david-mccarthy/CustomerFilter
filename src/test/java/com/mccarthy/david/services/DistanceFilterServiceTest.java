@@ -15,6 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test the distance filter service.
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class DistanceFilterServiceTest {
     @Mock
@@ -37,5 +40,6 @@ public class DistanceFilterServiceTest {
         when(distanceService.calculateDistance(anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(99D).thenReturn(100D).thenReturn(101D);
         List<Customer> filteredCustomers = distanceFilterService.filterCustomersByDistance(customers, 100);
         assertEquals("Size of filtered list is incorrect.", 1, filteredCustomers.size());
+        assertEquals("Expecting to get user with id = 1 returned.", 1, filteredCustomers.get(0).getUserId(), 0);
     }
 }
