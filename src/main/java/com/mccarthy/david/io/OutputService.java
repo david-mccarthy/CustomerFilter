@@ -40,7 +40,7 @@ public class OutputService {
         try {
             outputFileWriter = new FileWriter(outputFileName);
             for (Customer customer : customers) {
-                outputFileWriter.write(customer.toString() + "\n");
+                outputFileWriter.write(customer.getNameAndId() + "\n");
             }
         } catch (IOException ioe) {
             //We don't want failure to write to the output file to stop execution. Log and move on.
